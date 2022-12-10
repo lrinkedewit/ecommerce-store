@@ -9,7 +9,7 @@
     "start:prod": "npm run build && node ./dist/src/server.js",
     "build": "npx tsc",
     "test": "jest",
-    "start:nodemon": "./node_modules/nodemon/bin/nodemon.js"
+    "start:nodemon": "./node_modules/nodemon/bin/nodemon.js --es-module-specifier-resolution=node"
   },
   "repository": {
     "type": "git",
