@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es6",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-    "module": "ES2020",                                /* Specify what module code is generated. */
+    "module": "CommonJS",                                /* Specify what module code is generated. */
     "rootDir": "./",                                  /* Specify the root folder within your source files. */
     "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
     "outDir": "./dist",                                   /* Specify an output folder for all emitted files. */

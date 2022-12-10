@@ -1,22 +1,25 @@
-import { ErrorCode } from './error-code';
-export class ErrorException extends Error {
-    constructor(code = ErrorCode.UnknownError, metaData = null) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ErrorException = void 0;
+const error_code_1 = require("./error-code");
+class ErrorException extends Error {
+    constructor(code = error_code_1.ErrorCode.UnknownError, metaData = null) {
         super(code);
         Object.setPrototypeOf(this, new.target.prototype);
         this.name = code;
         this.status = 500;
         this.metaData = metaData;
         switch (code) {
-            case ErrorCode.Unauthenticated:
+            case error_code_1.ErrorCode.Unauthenticated:
                 this.status = 401;
                 break;
-            case ErrorCode.MaximumAllowedGrade:
+            case error_code_1.ErrorCode.MaximumAllowedGrade:
                 this.status = 400;
                 break;
-            case ErrorCode.AsyncError:
+            case error_code_1.ErrorCode.AsyncError:
                 this.status = 400;
                 break;
-            case ErrorCode.NotFound:
+            case error_code_1.ErrorCode.NotFound:
                 this.status = 404;
                 break;
             default:
@@ -25,3 +28,4 @@ export class ErrorException extends Error {
         }
     }
 }
+exports.ErrorException = ErrorException;
