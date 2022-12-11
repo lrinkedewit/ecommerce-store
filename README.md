@@ -91,3 +91,6 @@ Result --> 401, Unauthenticated error with WWW-Authenticate in header
 #### user gets all products with their id ✈️
 For this GET request, make sure to *add the token of the user to the Authorization header*. Depending on the token you add, the list of products associated with the token's id will be returned.
 
+## Conclusion
+I hope you enjoy playing around with my API! 😎
+
