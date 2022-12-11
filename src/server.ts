@@ -8,6 +8,8 @@ import { ErrorCode } from './error/error-code';
 import { comparePassword, passwordHash } from './utils/passwordUtils';
 import { compare } from 'bcrypt';
 import { generateAuthToken } from './utils/jwtUtils';
+import { authenticationMiddleware } from './middleware/authentiationMiddleware';
+import { retrieveID } from './middleware/retrieveID';
 
 
 const app = express();
@@ -90,18 +92,67 @@ app.post('/login', (req: Request, res: Response, next: NextFunction) => {
       }
     }
   })
+
+  stmt.finalize();
+
 })
 
-app.post('/product', (req: Request, res: Response, next: NextFunction) => {
-  // authentication JWT token
-
+app.post('/product', authenticationMiddleware, retrieveID, (req: Request, res: Response, next: NextFunction) => {
   // if all is verified, insert new product into table
+
+  const { name, description, price } = req.body;
+  const id = req.body.id
+
+  // add product to table
+  const stmt = db.prepare('INSERT INTO Product (advisor_id, name, description, price) VALUES (:advisor_id, :name, :description, :price)', { ':advisor_id': id, ':name': name, ':description': description, ':price': price }, (err) => {
+    if (err) {
+      console.log('Error preparing statement', err)
+    }
+    else {
+      console.log('Successfully prepared statement with params.');
+    }
+  })
+
+  stmt.get((err) => {
+    if (err) {
+      console.log(err)
+      next(new ErrorException(ErrorCode.UnknownError));
+    }
+    else res.status(200).send('Successfully added new product.');
+  })
+
+  stmt.finalize();
+
 })
 
-app.get('/product', (req: Request, res: Response, next: NextFunction) => {
-  // authentication with JWT token
+app.get('/product', authenticationMiddleware, retrieveID, (req: Request, res: Response, next: NextFunction) => {
 
-  // return all items linked to the advisor's id
+  const id = req.body.id
+  console.log(`this is our id!!!!`, id)
+
+  const stmt = db.prepare('SELECT * FROM Product WHERE advisor_id = (:advisor_id)', {':advisor_id': id}, (err) => {
+    if (err) {
+      console.log('Error preparing statement', err)
+    }
+    else {
+      console.log('Successfully prepared statement with params.');
+    }
+  })
+
+  stmt.all((err, rows) => {
+    if (err) {
+      console.log(err)
+      next(new ErrorException(ErrorCode.UnknownError));
+    }
+    else {
+      console.log(rows)
+      res.status(200).send(rows);
+    }
+  })
+
+
+
+
 })
 
 

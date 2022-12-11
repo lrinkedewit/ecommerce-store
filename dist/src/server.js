@@ -9,6 +9,8 @@ const error_exception_1 = require("./error/error-exception");
 const error_code_1 = require("./error/error-code");
 const passwordUtils_1 = require("./utils/passwordUtils");
 const jwtUtils_1 = require("./utils/jwtUtils");
+const authentiationMiddleware_1 = require("./middleware/authentiationMiddleware");
+const retrieveID_1 = require("./middleware/retrieveID");
 const app = (0, express_1.default)();
 app.use(express_1.default.urlencoded({
     extended: true,
@@ -77,14 +79,52 @@ app.post('/login', (req, res, next) => {
             }
         }
     });
+    stmt.finalize();
 });
-app.post('/product', (req, res, next) => {
-    // authentication JWT token
+app.post('/product', authentiationMiddleware_1.authenticationMiddleware, retrieveID_1.retrieveID, (req, res, next) => {
     // if all is verified, insert new product into table
+    const { name, description, price } = req.body;
+    const id = req.body.id;
+    // add product to table
+    const stmt = db_1.db.prepare('INSERT INTO Product (advisor_id, name, description, price) VALUES (:advisor_id, :name, :description, :price)', { ':advisor_id': id, ':name': name, ':description': description, ':price': price }, (err) => {
+        if (err) {
+            console.log('Error preparing statement', err);
+        }
+        else {
+            console.log('Successfully prepared statement with params.');
+        }
+    });
+    stmt.get((err) => {
+        if (err) {
+            console.log(err);
+            next(new error_exception_1.ErrorException(error_code_1.ErrorCode.UnknownError));
+        }
+        else
+            res.status(200).send('Successfully added new product.');
+    });
+    stmt.finalize();
 });
-app.get('/product', (req, res, next) => {
-    // authentication with JWT token
-    // return all items linked to the advisor's id
+app.get('/product', authentiationMiddleware_1.authenticationMiddleware, retrieveID_1.retrieveID, (req, res, next) => {
+    const id = req.body.id;
+    console.log(`this is our id!!!!`, id);
+    const stmt = db_1.db.prepare('SELECT * FROM Product WHERE advisor_id = (:advisor_id)', { ':advisor_id': id }, (err) => {
+        if (err) {
+            console.log('Error preparing statement', err);
+        }
+        else {
+            console.log('Successfully prepared statement with params.');
+        }
+    });
+    stmt.all((err, rows) => {
+        if (err) {
+            console.log(err);
+            next(new error_exception_1.ErrorException(error_code_1.ErrorCode.UnknownError));
+        }
+        else {
+            console.log(rows);
+            res.status(200).send(rows);
+        }
+    });
 });
 app.get('/test', (req, res) => {
     db_1.db.all('SELECT * FROM Advisor;', (err, rows) => {
