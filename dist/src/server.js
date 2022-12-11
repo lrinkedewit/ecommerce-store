@@ -5,7 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const db_1 = require("./db/db");
+const error_exception_1 = require("./error/error-exception");
+const error_code_1 = require("./error/error-code");
 const passwordUtils_1 = require("./utils/passwordUtils");
+const jwtUtils_1 = require("./utils/jwtUtils");
 const app = (0, express_1.default)();
 app.use(express_1.default.urlencoded({
     extended: true,
@@ -14,7 +17,7 @@ app.use(express_1.default.json());
 app.get('/', (req, res) => {
     res.send('Application works!');
 });
-app.post('/sign-up', (req, res) => {
+app.post('/sign-up', (req, res, next) => {
     const { email, name, password } = req.body;
     // hash password
     const hash = (0, passwordUtils_1.passwordHash)(password);
@@ -29,7 +32,7 @@ app.post('/sign-up', (req, res) => {
     });
     stmt.get((err) => {
         if (err) {
-            console.log('Error adding param', err);
+            next(new error_exception_1.ErrorException(error_code_1.ErrorCode.AlreadyExists));
         }
         else
             res.status(200).send('Successfully added new user.');
@@ -63,40 +66,45 @@ app.post('/login', (req, res, next) => {
                 if (passwordCorrect === true) {
                     // respond with JWT
                     console.log('issuing JWT');
+                    const token = (0, jwtUtils_1.generateAuthToken)(row);
+                    res.status(200).send(token);
                 }
                 else {
-                    //throw error password is incorrect
-                    // next(new ErrorException(ErrorCode.Unauthenticated));
+                    // THROW ERROR password is incorrect
+                    next(new error_exception_1.ErrorException(error_code_1.ErrorCode.Unauthenticated));
                     console.log('password is incorrect');
                 }
             }
         }
     });
 });
+app.post('/product', (req, res, next) => {
+    // authentication JWT token
+    // if all is verified, insert new product into table
+});
+app.get('/product', (req, res, next) => {
+    // authentication with JWT token
+    // return all items linked to the advisor's id
+});
 app.get('/test', (req, res) => {
-    db_1.db.all('SELECT * FROM Advisor;', (err) => {
+    db_1.db.all('SELECT * FROM Advisor;', (err, rows) => {
         if (err) {
             console.log('Error retaining rows from Advisor table', err);
         }
+        else {
+            console.log(`Here are the rows in the Advisor table`, rows);
+        }
     });
-    res.status(200).send('All entries are available in Advisor table.');
+    db_1.db.all('SELECT * FROM Product;', (err, rows) => {
+        if (err) {
+            console.log('Error retaining rows from Product table', err);
+        }
+        else {
+            console.log('Here are the rows in the Product table', rows);
+        }
+    });
+    res.status(200).send('All entries are available in Advisor and Product table.');
 });
-// app.get('/throw-unauthenticated', (req: Request, res: Response, next: NextFunction) => {
-//   throw new ErrorException(ErrorCode.Unauthenticated);
-//   // or
-//   // next(new ErrorException(ErrorCode.Unauthenticated))
-// });
-// app.get('/throw-maximum-allowed-grade', (req: Request, res: Response, next: NextFunction) => {
-//   throw new ErrorException(ErrorCode.MaximumAllowedGrade, { grade: Math.random() });
-//   // or
-//   // next(new ErrorException(ErrorCode.MaximumAllowedGrade, { grade: Math.random() }))
-// });
-// app.get('/throw-unknown-error', (req: Request, res: Response, next: NextFunction) => {
-//   const num: any = null;
-//   // Node.js will throw an error because there is no length property inside num variable
-//   console.log(num.length);
-// });
-// app.use(errorHandler); // registration of handler
 app.listen(3000, () => {
     console.log('Application started on port 3000!');
 });

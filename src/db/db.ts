@@ -16,10 +16,27 @@ CREATE TABLE IF NOT EXISTS Advisor (
   name VARCHAR(200) NOT NULL
 )`
 
+const newProductTable = `
+CREATE TABLE IF NOT EXISTS Product (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  advisor_id INTEGER NOT NULL,
+  name VARCHAR(200) NOT NULL,
+  description VARCHAR(500) NOT NULL,
+  price DECIMAL NOT NULL,
+  FOREIGN KEY (advisor_id) REFERENCES Advisor (id)
+)
+`
+
 db.exec(newAdvisorTable);
+db.exec(newProductTable);
 
 db.all(
   'SELECT * FROM Advisor',
+  (_, res) => console.log('All rows in Advisor table when server is started.', res)
+);
+
+db.all(
+  'SELECT * FROM Product',
   (_, res) => console.log('All rows in Advisor table when server is started.', res)
 );
 

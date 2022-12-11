@@ -24,7 +24,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Application works!');
 });
 
-app.post('/sign-up', (req: Request, res: Response) => {
+app.post('/sign-up', (req: Request, res: Response, next: NextFunction) => {
   const { email, name, password } = req.body;
 
   // hash password
@@ -42,7 +42,7 @@ app.post('/sign-up', (req: Request, res: Response) => {
 
   stmt.get((err) => {
     if (err) {
-      console.log('Error adding param', err);
+      next(new ErrorException(ErrorCode.AlreadyExists));
     }
     else res.status(200).send('Successfully added new user.');
   })
@@ -92,14 +92,35 @@ app.post('/login', (req: Request, res: Response, next: NextFunction) => {
   })
 })
 
+app.post('/product', (req: Request, res: Response, next: NextFunction) => {
+  // authentication JWT token
+
+  // if all is verified, insert new product into table
+})
+
+app.get('/product', (req: Request, res: Response, next: NextFunction) => {
+  // authentication with JWT token
+
+  // return all items linked to the advisor's id
+})
+
 
 app.get('/test', (req: Request, res: Response) => {
-  db.all('SELECT * FROM Advisor;', (err) => {
+  db.all('SELECT * FROM Advisor;', (err, rows) => {
     if (err) {
       console.log('Error retaining rows from Advisor table', err)
+    } else {
+      console.log(`Here are the rows in the Advisor table`, rows)
     }
   });
-  res.status(200).send('All entries are available in Advisor table.');
+  db.all('SELECT * FROM Product;', (err, rows) => {
+    if (err) {
+      console.log('Error retaining rows from Product table', err)
+    } else {
+      console.log('Here are the rows in the Product table', rows)
+    }
+  });
+  res.status(200).send('All entries are available in Advisor and Product table.');
 });
 
 
