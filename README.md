@@ -12,6 +12,21 @@ This API has a simplified authentication flow for a basic ecommerce-store. It al
 6. Great! You're up and running!
 
 ## Postman ➡️
+
+<div class="postman-run-button"
+data-postman-action="collection/import"
+data-postman-var-1="09dccb31923447f13aec"></div>
+<script type="text/javascript">
+  (function (p,o,s,t,m,a,n) {
+    !p[s] && (p[s] = function () { (p[t] || (p[t] = [])).push(arguments); });
+    !o.getElementById(s+t) && o.getElementsByTagName("head")[0].appendChild((
+      (n = o.createElement("script")),
+      (n.id = s+t), (n.async = 1), (n.src = m), n
+    ));
+  }(window, document, "_pm", "PostmanRunObject", "https://run.pstmn.io/button.js"));
+</script>
+
+
 All endpoints were tested using Postman - I was hoping to convert these into tests but ended up running out of time. I have created a collection of endpoints in Postman for your ease of use!
 
 ### sign-up
@@ -67,7 +82,7 @@ The following JSON is sent to the API from the client.
 ```
 
 **IMPORTANT**
-Make sure to add the token to the Authorization header in Postman. *Key* = Authorization, *value* = Bearer <token>
+Make sure to add the token to the Authorization header in Postman. *Key* = Authorization, *value* = Bearer + `<token>`
 
 Result --> 200, New product is added to the **Product** table with the advisor_id as a foreign key
 Check --> Send GET in Postman to http://localhost:3000/readProductTable
@@ -85,7 +100,6 @@ The following JSON is sent to the API from the client.
 Result --> 401, Unauthenticated error with WWW-Authenticate in header
 
 ### retrieving products
+#### user gets all products with their id ✈️
+For this GET request, make sure to *add the token of the user to the Authorization header*. Depending on the token you add, the list of products associated with the token's id will be returned.
 
-Make sure to add the Authorization header, together with the Bearer <token>
-
-Ideallly, would have added a router

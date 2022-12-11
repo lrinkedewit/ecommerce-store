@@ -92,7 +92,7 @@ app.post('/product', authentiationMiddleware_1.authenticationMiddleware, retriev
     }).finalize();
 });
 app.get('/product', authentiationMiddleware_1.authenticationMiddleware, retrieveID_1.retrieveID, (req, res, next) => {
-    const id = res.locals.id;
+    const id = res.locals.tokenData.id;
     const stmt = db_1.db.prepare('SELECT * FROM Product WHERE advisor_id = (:advisor_id)', { ':advisor_id': id }, (err) => {
         if (err) {
             next(new error_exception_1.ErrorException(error_code_1.ErrorCode.UnknownError));

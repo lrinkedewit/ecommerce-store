@@ -101,7 +101,7 @@ app.post('/product', authenticationMiddleware, retrieveID, (req: Request, res: R
 })
 
 app.get('/product', authenticationMiddleware, retrieveID, (req: Request, res: Response, next: NextFunction) => {
-  const id = res.locals.id
+  const id = res.locals.tokenData.id
 
   const stmt = db.prepare('SELECT * FROM Product WHERE advisor_id = (:advisor_id)', {':advisor_id': id}, (err) => {
     if (err) {
