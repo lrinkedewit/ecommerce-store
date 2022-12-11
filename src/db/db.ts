@@ -1,7 +1,7 @@
 import pkg from 'sqlite3';
 const { Database, OPEN_READWRITE, OPEN_CREATE} = pkg;
 
-let db = new Database('./advisor.db', OPEN_READWRITE | OPEN_CREATE, (err) => {
+const db = new Database('./advisor.db', OPEN_READWRITE | OPEN_CREATE, (err) => {
   if (err) {
     return console.error(err.message);
   }
@@ -11,21 +11,23 @@ let db = new Database('./advisor.db', OPEN_READWRITE | OPEN_CREATE, (err) => {
 const newAdvisorTable = `
 CREATE TABLE IF NOT EXISTS Advisor (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  email VARCHAR(100) NOT NULL,
-  password CHAR(10) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  password CHAR(60) NOT NULL,
   name VARCHAR(200) NOT NULL
 )`
 
-db.exec((newAdvisorTable));
+db.exec(newAdvisorTable);
 
 db.all(
-  'SELECT * FROM newAdvisorTable',
-  (_, res) => console.log(res)
+  'SELECT * FROM Advisor',
+  (_, res) => console.log('All rows in Advisor table when server is started.', res)
 );
 
-db.close((err) => {
-  if (err) {
-    return console.error(err.message);
-  }
-  console.log('Closed the database connection.');
-});
+// db.close((err) => {
+//   if (err) {
+//     return console.error(err.message);
+//   }
+//   console.log('Closed the database connection.');
+// });
+
+export { db };
