@@ -19,6 +19,9 @@ class ErrorException extends Error {
             case error_code_1.ErrorCode.AsyncError:
                 this.status = 400;
                 break;
+            case error_code_1.ErrorCode.AlreadyExists:
+                this.status = 422;
+                break;
             case error_code_1.ErrorCode.NotFound:
                 this.status = 404;
                 break;

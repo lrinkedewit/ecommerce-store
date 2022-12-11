@@ -9,3 +9,4 @@ ErrorCode.NotFound = 'NotFound';
 ErrorCode.MaximumAllowedGrade = 'MaximumAllowedGrade';
 ErrorCode.AsyncError = 'AsyncError';
 ErrorCode.UnknownError = 'UnknownError';
+ErrorCode.AlreadyExists = 'User already exists';
