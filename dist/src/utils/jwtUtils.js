@@ -7,6 +7,7 @@ exports.verifyToken = exports.generateAuthToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const error_exception_1 = require("../error/error-exception");
 const error_code_1 = require("../error/error-code");
+// Public key, this is a dummy key
 const jwtKey = '12345';
 const generateAuthToken = (user) => {
     const token = jsonwebtoken_1.default.sign({ _id: user._id, email: user.email }, jwtKey, {

@@ -3,6 +3,7 @@ import { ErrorException } from '../error/error-exception';
 import { ErrorCode } from '../error/error-code';
 import { IUser } from 'src/types';
 
+// Public key, this is a dummy key
 const jwtKey = '12345';
 
 export const generateAuthToken = (user: IUser): string => {

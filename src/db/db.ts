@@ -1,7 +1,7 @@
 import pkg from 'sqlite3';
 const { Database, OPEN_READWRITE, OPEN_CREATE} = pkg;
 
-const db = new Database('./advisor.db', OPEN_READWRITE | OPEN_CREATE, (err) => {
+const db = new Database('./ecommerce.db', OPEN_READWRITE | OPEN_CREATE, (err) => {
   if (err) {
     return console.error(err.message);
   }
@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS Product (
 db.exec(newAdvisorTable);
 db.exec(newProductTable);
 
+
+// Log to show that tables have been created for future insertion
 db.all(
   'SELECT * FROM Advisor',
   (_, res) => console.log('All rows in Advisor table when server is started.', res)
@@ -37,7 +39,7 @@ db.all(
 
 db.all(
   'SELECT * FROM Product',
-  (_, res) => console.log('All rows in Advisor table when server is started.', res)
+  (_, res) => console.log('All rows in Product table when server is started.', res)
 );
 
 // db.close((err) => {

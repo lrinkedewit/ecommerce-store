@@ -10,12 +10,12 @@ export const authenticationMiddleware = (req: Request, res: Response, next: Next
 
     try {
       const tokenData = verifyToken(token);
-      req.body.tokenData = tokenData;
+      res.locals.tokenData = tokenData;
       next();
     } catch (error) {
-      throw new ErrorException(ErrorCode.Unauthenticated);
+      res.status(401).setHeader('WWW-Authenticate', 'Bearer').send();
     }
   } else {
-    throw new ErrorException(ErrorCode.Unauthenticated);
+    res.status(401).setHeader('WWW-Authenticate', 'Bearer').send();
   }
 };

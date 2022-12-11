@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.db = void 0;
 const sqlite3_1 = __importDefault(require("sqlite3"));
 const { Database, OPEN_READWRITE, OPEN_CREATE } = sqlite3_1.default;
-const db = new Database('./advisor.db', OPEN_READWRITE | OPEN_CREATE, (err) => {
+const db = new Database('./ecommerce.db', OPEN_READWRITE | OPEN_CREATE, (err) => {
     if (err) {
         return console.error(err.message);
     }
@@ -32,5 +32,6 @@ CREATE TABLE IF NOT EXISTS Product (
 `;
 db.exec(newAdvisorTable);
 db.exec(newProductTable);
+// Log to show that tables have been created for future insertion
 db.all('SELECT * FROM Advisor', (_, res) => console.log('All rows in Advisor table when server is started.', res));
-db.all('SELECT * FROM Product', (_, res) => console.log('All rows in Advisor table when server is started.', res));
+db.all('SELECT * FROM Product', (_, res) => console.log('All rows in Product table when server is started.', res));

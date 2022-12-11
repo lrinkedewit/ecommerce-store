@@ -1,16 +1,14 @@
 import express from 'express';
 import { Request, Response, NextFunction } from 'express';
+import { ERROR } from 'sqlite3'
 
 import { db } from './db/db';
-import { errorHandler } from './error/error-handler'
 import { ErrorException } from './error/error-exception';
 import { ErrorCode } from './error/error-code';
 import { comparePassword, passwordHash } from './utils/passwordUtils';
-import { compare } from 'bcrypt';
 import { generateAuthToken } from './utils/jwtUtils';
 import { authenticationMiddleware } from './middleware/authentiationMiddleware';
 import { retrieveID } from './middleware/retrieveID';
-
 
 const app = express();
 app.use(
@@ -32,131 +30,98 @@ app.post('/sign-up', (req: Request, res: Response, next: NextFunction) => {
   // hash password
   const hash = passwordHash(password);
 
-  // insert sanitized values into Advisor table
+  // Bind values to parameters in SQL query
   const stmt = db.prepare('INSERT INTO Advisor (email, name, password) VALUES (:email, :name, :password)', { ':email': email, ':name': name, ':password': hash }, (err) => {
     if (err) {
-      console.log('Error preparing statement', err)
-    }
-    else {
-      console.log('Successfully prepared statement with params.');
+      next(new ErrorException(ErrorCode.UnknownError));
     }
   })
 
+  // Execute SQL query
   stmt.get((err) => {
     if (err) {
-      next(new ErrorException(ErrorCode.AlreadyExists));
+      // 19 = SQL constraint (UNIQUE)
+      if ((err as any).errno  === 19) {
+        next(new ErrorException(ErrorCode.AlreadyExists));  
+      }
+      else next(new ErrorException(ErrorCode.UnknownError));
     }
     else res.status(200).send('Successfully added new user.');
-  })
-
-  stmt.finalize();
+  }).finalize();
   
 })
 
 app.post('/login', (req: Request, res: Response, next: NextFunction) => {
-  // destructure req.body
   const { email, password } = req.body;
 
-  // check if email exists
   const stmt = db.prepare('SELECT * FROM Advisor WHERE (email) = (:email)', { ':email': email }, (err) => {
     if (err) {
-      console.log('Error preparing statement', err)
-    }
-    else {
-      console.log('Successfully prepared statement with params.');
-      console.log(email)
+      next(new ErrorException(ErrorCode.UnknownError));
     }
   })
-
+ 
   stmt.get((err, row) => {
     if (err) {
-      console.log('Error querying database in login flow', err);
+      next(new ErrorException(ErrorCode.UnknownError));
     }
     else {
+      // When no rows are returned, it means the email doesn't exist in the Advisor table
       if (row === undefined) {
-        console.log('Email does not exist')
+        next(new ErrorException(ErrorCode.Unauthenticated))
       }
       else {
-        console.log('Email exists', row)
-        const passwordCorrect = comparePassword(password, row.password)
-        if (passwordCorrect === true) {
-          // respond with JWT
-          console.log('issuing JWT')
+        if (comparePassword(password, row.password)) {
+          // If passwords match, issue JWT
           const token = generateAuthToken(row)
           res.status(200).send(token);
         } else {
           // THROW ERROR password is incorrect
-            next(new ErrorException(ErrorCode.Unauthenticated));
-          console.log('password is incorrect')
+          next(new ErrorException(ErrorCode.Unauthenticated));
         }
       }
     }
-  })
-
-  stmt.finalize();
-
+  }).finalize();
 })
 
 app.post('/product', authenticationMiddleware, retrieveID, (req: Request, res: Response, next: NextFunction) => {
-  // if all is verified, insert new product into table
-
   const { name, description, price } = req.body;
-  const id = req.body.id
+  const id = res.locals.id
 
-  // add product to table
   const stmt = db.prepare('INSERT INTO Product (advisor_id, name, description, price) VALUES (:advisor_id, :name, :description, :price)', { ':advisor_id': id, ':name': name, ':description': description, ':price': price }, (err) => {
     if (err) {
-      console.log('Error preparing statement', err)
-    }
-    else {
-      console.log('Successfully prepared statement with params.');
+      next(new ErrorException(ErrorCode.UnknownError));
     }
   })
 
   stmt.get((err) => {
     if (err) {
-      console.log(err)
       next(new ErrorException(ErrorCode.UnknownError));
     }
     else res.status(200).send('Successfully added new product.');
-  })
-
-  stmt.finalize();
-
+  }).finalize();
 })
 
 app.get('/product', authenticationMiddleware, retrieveID, (req: Request, res: Response, next: NextFunction) => {
-
-  const id = req.body.id
-  console.log(`this is our id!!!!`, id)
+  const id = res.locals.id
 
   const stmt = db.prepare('SELECT * FROM Product WHERE advisor_id = (:advisor_id)', {':advisor_id': id}, (err) => {
     if (err) {
-      console.log('Error preparing statement', err)
-    }
-    else {
-      console.log('Successfully prepared statement with params.');
+      next(new ErrorException(ErrorCode.UnknownError));
     }
   })
 
   stmt.all((err, rows) => {
     if (err) {
-      console.log(err)
       next(new ErrorException(ErrorCode.UnknownError));
     }
     else {
-      console.log(rows)
       res.status(200).send(rows);
     }
   })
-
-
-
-
 })
 
-
-app.get('/test', (req: Request, res: Response) => {
+// Admin only, for testing purposes in Postman
+app.get('/readalltables', (req: Request, res: Response) => {
   db.all('SELECT * FROM Advisor;', (err, rows) => {
     if (err) {
       console.log('Error retaining rows from Advisor table', err)
@@ -179,3 +144,4 @@ app.listen(3000, () => {
   console.log('Application started on port 3000!');
 });
 
+export { app };
