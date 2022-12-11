@@ -4,7 +4,7 @@ import { ErrorException } from '../error/error-exception';
 import { db } from '../db/db';
 
 export const retrieveID = (req: Request, res: Response, next: NextFunction) => {
-  // find users id based on their email
+  // Find user's id based on their email
   const email: string = res.locals.tokenData.email;
   const idStmt = db.prepare('SELECT id FROM Advisor WHERE email = (:email)', {':email': email});
 

@@ -42,11 +42,4 @@ db.all(
   (_, res) => console.log('All rows in Product table when server is started.', res)
 );
 
-// db.close((err) => {
-//   if (err) {
-//     return console.error(err.message);
-//   }
-//   console.log('Closed the database connection.');
-// });
-
 export { db };

@@ -1,6 +1,5 @@
 import express from 'express';
 import { Request, Response, NextFunction } from 'express';
-import { ERROR } from 'sqlite3'
 
 import { db } from './db/db';
 import { ErrorException } from './error/error-exception';
