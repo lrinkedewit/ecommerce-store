@@ -15,7 +15,7 @@ This API has a simplified authentication flow for a basic ecommerce-store. It al
 All endpoints were tested using Postman - I was hoping to convert these into tests but ended up running out of time. I have created a collection of endpoints in Postman for your ease of use!
 
 ### sign-up
-#### new user sign-up
+#### new user sign-up ✈️
 The following JSON is sent to the API from the client.
 ```json
 {
@@ -31,7 +31,7 @@ Result --> 200, New user is added to the **Advisor** table.
 Check --> Send GET in Postman to http://localhost:3000/readAdvisorTable
 
 ### login
-#### user login correct password
+#### user login correct password ✈️
 The following JSON is sent to the API from the client.
 ```json
 {
@@ -43,7 +43,7 @@ The following JSON is sent to the API from the client.
 
 Result --> 200, JWT token is sent back to the client
 
-#### user login wrong password
+#### user login wrong password ✈️
 The following JSON is sent to the API from the client.
 ```json
 {
@@ -56,7 +56,7 @@ The following JSON is sent to the API from the client.
 Result --> 401, Unauthenticated error
 
 ### adding products
-#### user adds product with auth header
+#### user adds product with auth header ✈️
 The following JSON is sent to the API from the client.
 ```json
 {
@@ -72,7 +72,7 @@ Make sure to add the token to the Authorization header in Postman. *Key* = Autho
 Result --> 200, New product is added to the **Product** table with the advisor_id as a foreign key
 Check --> Send GET in Postman to http://localhost:3000/readProductTable
 
-#### user adds product withOUT auth header
+#### user adds product withOUT auth header ✈️
 The following JSON is sent to the API from the client.
 ```json
 {
