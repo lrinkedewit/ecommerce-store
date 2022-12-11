@@ -84,7 +84,7 @@ app.post('/login', (req: Request, res: Response, next: NextFunction) => {
 
 app.post('/product', authenticationMiddleware, retrieveID, (req: Request, res: Response, next: NextFunction) => {
   const { name, description, price } = req.body;
-  const id = res.locals.id
+  const id = res.locals.tokenData.id
 
   const stmt = db.prepare('INSERT INTO Product (advisor_id, name, description, price) VALUES (:advisor_id, :name, :description, :price)', { ':advisor_id': id, ':name': name, ':description': description, ':price': price }, (err) => {
     if (err) {
@@ -114,28 +114,29 @@ app.get('/product', authenticationMiddleware, retrieveID, (req: Request, res: Re
       next(new ErrorException(ErrorCode.UnknownError));
     }
     else {
+      console.log(rows)
       res.status(200).send(rows);
     }
   })
 })
 
 // Admin only, for testing purposes in Postman
-app.get('/readalltables', (req: Request, res: Response) => {
+app.get('/readAdvisorTable', (req: Request, res: Response, next: NextFunction) => {
   db.all('SELECT * FROM Advisor;', (err, rows) => {
     if (err) {
-      console.log('Error retaining rows from Advisor table', err)
-    } else {
-      console.log(`Here are the rows in the Advisor table`, rows)
-    }
+      next(new ErrorException(ErrorCode.UnknownError));
+    } 
+    res.status(200).send(rows);
   });
+});
+
+app.get('/readProductTable', (req: Request, res: Response, next: NextFunction) => {
   db.all('SELECT * FROM Product;', (err, rows) => {
     if (err) {
-      console.log('Error retaining rows from Product table', err)
-    } else {
-      console.log('Here are the rows in the Product table', rows)
-    }
+      next(new ErrorException(ErrorCode.UnknownError));
+    } 
+    res.status(200).send(rows);
   });
-  res.status(200).send('All entries are available in Advisor and Product table.');
 });
 
 

@@ -13,7 +13,7 @@ export const retrieveID = (req: Request, res: Response, next: NextFunction) => {
       next(new ErrorException(ErrorCode.UnknownError));
     }
     else {
-      res.locals.id = row.id;
+      res.locals.tokenData.id = row.id;
       next();
     }
   })

@@ -77,7 +77,7 @@ app.post('/login', (req, res, next) => {
 });
 app.post('/product', authentiationMiddleware_1.authenticationMiddleware, retrieveID_1.retrieveID, (req, res, next) => {
     const { name, description, price } = req.body;
-    const id = res.locals.id;
+    const id = res.locals.tokenData.id;
     const stmt = db_1.db.prepare('INSERT INTO Product (advisor_id, name, description, price) VALUES (:advisor_id, :name, :description, :price)', { ':advisor_id': id, ':name': name, ':description': description, ':price': price }, (err) => {
         if (err) {
             next(new error_exception_1.ErrorException(error_code_1.ErrorCode.UnknownError));
@@ -103,29 +103,27 @@ app.get('/product', authentiationMiddleware_1.authenticationMiddleware, retrieve
             next(new error_exception_1.ErrorException(error_code_1.ErrorCode.UnknownError));
         }
         else {
+            console.log(rows);
             res.status(200).send(rows);
         }
     });
 });
-// Admin Only, for testing purposes in Postman
-app.get('/readalltables', (req, res) => {
+// Admin only, for testing purposes in Postman
+app.get('/readAdvisorTable', (req, res, next) => {
     db_1.db.all('SELECT * FROM Advisor;', (err, rows) => {
         if (err) {
-            console.log('Error retaining rows from Advisor table', err);
+            next(new error_exception_1.ErrorException(error_code_1.ErrorCode.UnknownError));
         }
-        else {
-            console.log(`Here are the rows in the Advisor table`, rows);
-        }
+        res.status(200).send(rows);
     });
+});
+app.get('/readProductTable', (req, res, next) => {
     db_1.db.all('SELECT * FROM Product;', (err, rows) => {
         if (err) {
-            console.log('Error retaining rows from Product table', err);
+            next(new error_exception_1.ErrorException(error_code_1.ErrorCode.UnknownError));
         }
-        else {
-            console.log('Here are the rows in the Product table', rows);
-        }
+        res.status(200).send(rows);
     });
-    res.status(200).send('All entries are available in Advisor and Product table.');
 });
 app.listen(3000, () => {
     console.log('Application started on port 3000!');
