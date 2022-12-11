@@ -2,11 +2,12 @@ import express from 'express';
 import { Request, Response, NextFunction } from 'express';
 
 import { db } from './db/db';
-import { errorHandler } from 'src/error/error-handler'
-import { ErrorException } from 'src/error/error-exception';
-import { ErrorCode } from 'src/error/error-code';
+import { errorHandler } from './error/error-handler'
+import { ErrorException } from './error/error-exception';
+import { ErrorCode } from './error/error-code';
 import { comparePassword, passwordHash } from './utils/passwordUtils';
 import { compare } from 'bcrypt';
+import { generateAuthToken } from './utils/jwtUtils';
 
 
 const app = express();
@@ -79,9 +80,11 @@ app.post('/login', (req: Request, res: Response, next: NextFunction) => {
         if (passwordCorrect === true) {
           // respond with JWT
           console.log('issuing JWT')
+          const token = generateAuthToken(row)
+          res.status(200).send(token);
         } else {
-          //THROW ERROR password is incorrect
-            // next(new ErrorException(ErrorCode.Unauthenticated));
+          // THROW ERROR password is incorrect
+            next(new ErrorException(ErrorCode.Unauthenticated));
           console.log('password is incorrect')
         }
       }
@@ -95,27 +98,9 @@ app.get('/test', (req: Request, res: Response) => {
     if (err) {
       console.log('Error retaining rows from Advisor table', err)
     }
-  })
-  res.status(200).send('All entries are available in Advisor table.')
-})
-
-// app.get('/throw-unauthenticated', (req: Request, res: Response, next: NextFunction) => {
-//   throw new ErrorException(ErrorCode.Unauthenticated);
-//   // or
-//   // next(new ErrorException(ErrorCode.Unauthenticated))
-// });
-// app.get('/throw-maximum-allowed-grade', (req: Request, res: Response, next: NextFunction) => {
-//   throw new ErrorException(ErrorCode.MaximumAllowedGrade, { grade: Math.random() });
-//   // or
-//   // next(new ErrorException(ErrorCode.MaximumAllowedGrade, { grade: Math.random() }))
-// });
-// app.get('/throw-unknown-error', (req: Request, res: Response, next: NextFunction) => {
-//   const num: any = null;
-//   // Node.js will throw an error because there is no length property inside num variable
-//   console.log(num.length);
-// });
-
-// app.use(errorHandler); // registration of handler
+  });
+  res.status(200).send('All entries are available in Advisor table.');
+});
 
 
 app.listen(3000, () => {
