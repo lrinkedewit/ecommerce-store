@@ -13,9 +13,9 @@ This API has a simplified authentication flow for a basic ecommerce-store. It al
 
 ## Postman ➡️
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/09dccb31923447f13aec?action=collection%2Fimport)
+All endpoints were tested using Postman - I was hoping to convert these into tests but ended up running out of time. I have created a collection of endpoints in Postman for your ease of use! **CLICK** the following button to download the collection.
 
-All endpoints were tested using Postman - I was hoping to convert these into tests but ended up running out of time. I have created a collection of endpoints in Postman for your ease of use!
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/09dccb31923447f13aec?action=collection%2Fimport)
 
 ### sign-up
 #### new user sign-up ✈️
